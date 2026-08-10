@@ -1,0 +1,84 @@
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
+public class FunctionalSortingDemo {
+
+    public static <T extends Comparable<T>> List<T> quickSort(List<T> list) {
+        if (list == null || list.size() <= 1) {
+            return list;
+        }
+
+        T pivot = list.get(0);
+        List<T> tail = list.subList(1, list.size());
+
+        List<T> smaller = tail.stream().filter(x -> x.compareTo(pivot) <= 0).toList();
+        List<T> greater = tail.stream().filter(x -> x.compareTo(pivot) > 0).toList();
+
+        return Stream.concat(
+            Stream.concat(quickSort(smaller).stream(), Stream.of(pivot)),
+            quickSort(greater).stream()
+        ).toList();
+    }
+
+    public static <T extends Comparable<T>> List<T> mergeSort(List<T> list) {
+        if (list == null || list.size() <= 1) {
+            return list;
+        }
+
+        int mid = list.size() / 2;
+        List<T> left = mergeSort(list.subList(0, mid));
+        List<T> right = mergeSort(list.subList(mid, list.size()));
+
+        return merge(left, right);
+    }
+
+    private static <T extends Comparable<T>> List<T> merge(List<T> left, List<T> right) {
+        if (left.isEmpty()) return right;
+        if (right.isEmpty()) return left;
+
+        if (left.get(0).compareTo(right.get(0)) <= 0) {
+            return Stream.concat(
+                Stream.of(left.get(0)),
+                merge(left.subList(1, left.size()), right).stream()
+            ).toList();
+        } else {
+            return Stream.concat(
+                Stream.of(right.get(0)),
+                merge(left, right.subList(1, right.size())).stream()
+            ).toList();
+        }
+    }
+
+    public static <T, R extends Comparable<R>> List<T> sortBy(List<T> list, Function<T, R> keyExtractor) {
+        return list.stream()
+                .sorted(Comparator.comparing(keyExtractor))
+                .toList();
+    }
+
+    public static void main(String[] args) {
+        List<Integer> numbers = List.of(42, 12, 89, 27, 5, 63, 12);
+
+        long startQuick = System.nanoTime();
+        List<Integer> quickSorted = quickSort(numbers);
+        long durationQuick = System.nanoTime() - startQuick;
+
+        long startMerge = System.nanoTime();
+        List<Integer> mergeSorted = mergeSort(numbers);
+        long durationMerge = System.nanoTime() - startMerge;
+
+        List<String> words = List.of("Functional", "Java", "Code", "Stream", "Sort");
+
+        long startSortBy = System.nanoTime();
+        List<String> sortedByLength = sortBy(words, String::length);
+        long durationSortBy = System.nanoTime() - startSortBy;
+
+        System.out.println("Original Numbers: " + numbers);
+        System.out.println("QuickSort: " + quickSorted + " | Execution Time: " + (durationQuick / 1_000.0) + " µs");
+        System.out.println("MergeSort: " + mergeSorted + " | Execution Time: " + (durationMerge / 1_000.0) + " µs");
+
+        System.out.println("\nOriginal Words: " + words);
+        System.out.println("Sorted by length: " + sortedByLength + " | Execution Time: " + (durationSortBy / 1_000.0) + " µs");
+    }
+}
