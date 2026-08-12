@@ -1,0 +1,24 @@
+import java.util.Collection;
+import java.util.List;
+
+public class FlatMapDemo {
+    public static void main(String[] args) {
+        List<List<String>> devTeams = List.of(
+            List.of("Alice", "Bob"),
+            List.of("Charlie", "David"),
+            List.of("Eve", "Frank")
+        );
+
+        List<List<String>> nestedResult = devTeams.stream()
+                .map(team -> team)
+                .toList();
+        System.out.println("Nested:    " + nestedResult);
+
+      
+        List<String> allDevelopers = devTeams.stream()
+                .flatMap(Collection::stream) // Flattens into a single stream of Strings
+                .toList();
+
+        System.out.println("Flattened: " + allDevelopers);
+    }
+}
