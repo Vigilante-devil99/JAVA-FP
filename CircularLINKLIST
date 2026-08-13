@@ -1,0 +1,70 @@
+import java.util.function.Consumer;
+
+class CircularLinkedList {
+    static class Node {
+        int data; Node next;
+        Node(int d) { data = d; }
+    }
+
+    private Node last;
+
+    public void forEach(Consumer<Integer> action) {
+        if (last == null) return;
+        Node c = last.next;
+        do { action.accept(c.data); c = c.next; } while (c != last.next);
+    }
+
+    public void traverse() {
+        forEach(d -> System.out.print(d + " -> "));
+        System.out.println(last != null ? "(head: " + last.next.data + ")" : "Empty");
+    }
+
+    public void insert(int d) {
+        Node n = new Node(d);
+        if (last == null) last = n.next = n;
+        else { n.next = last.next; last = last.next = n; }
+    }
+
+    public void delete(int k) {
+        if (last == null) return;
+        if (last == last.next && last.data == k) last = null;
+        else del(last.next, last, last.next, k);
+    }
+
+    private void del(Node c, Node p, Node h, int k) {
+        if (c.data == k) {
+            p.next = c.next;
+            if (c == last) last = p;
+        } else if (c.next != h) del(c.next, c, h, k);
+    }
+
+    public void reverse() {
+        if (last != null && last.next != last) {
+            Node h = last.next;
+            rev(h, last, h);
+            last = h;
+        }
+    }
+
+    private void rev(Node c, Node p, Node h) {
+        Node n = c.next;
+        c.next = p;
+        if (n != h) rev(n, c, h);
+    }
+
+    public static void main(String[] args) {
+        CircularLinkedList cll = new CircularLinkedList();
+
+        cll.insert(10);
+        cll.insert(20);
+        cll.insert(30);
+        cll.insert(40);
+        cll.traverse();
+
+        cll.delete(20);
+        cll.traverse();
+
+        cll.reverse();
+        cll.traverse();
+    }
+}
