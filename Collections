@@ -5,7 +5,7 @@ public class FlatMapDemo {
     public static void main(String[] args) {
         List<List<String>> devTeams = List.of(
             List.of("Alice", "Bob"),
-            List.of("Charlie", "David"),
+            List.of("Charlie", "David")
             List.of("Eve", "Frank")
         );
 
